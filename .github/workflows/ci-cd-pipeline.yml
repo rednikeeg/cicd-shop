@@ -1,0 +1,50 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main", "feature/**" ]
+    paths-ignore:
+      - 'README.md'
+      - '.gitignore'
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:  # Allows manual trigger
+
+env:
+  IMAGE_NAME: cicd-shop
+  CONTAINER_REGISTRY: docker.io  # or ghcr.io for GitHub Container Registry
+  K8S_NAMESPACE: cicd-shop
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up JDK 21
+      uses: actions/setup-java@v3
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: 'maven'
+
+    - name: Build with Maven
+      run: ./mvnw -B package --file pom.xml -DskipTests
+
+    - name: Run Unit Tests
+      run: ./mvnw test
+
+    - name: Run Integration Tests
+      run: ./mvnw verify -Pintegration-test
+      env:
+        SPRING_PROFILES_ACTIVE: test
+
+    - name: Code Coverage Report
+      if: always()
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./target/site/jacoco/jacoco.xml
+        fail_ci_if_error: false
