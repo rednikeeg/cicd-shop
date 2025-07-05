@@ -45,9 +45,10 @@ jobs:
       env:
         SPRING_PROFILES_ACTIVE: test
 
-    - name: Code Coverage Report
-      if: always()
-      uses: codecov/codecov-action@v3
+    - name: Upload coverage to Coveralls
+      uses: coverallsapp/github-action@v2
       with:
-        file: ./target/site/jacoco/jacoco.xml
-        fail_ci_if_error: false
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: ./target/site/jacoco/jacoco.xml
+        flag-name: run-${{ github.run_id }}
+        parallel: true
