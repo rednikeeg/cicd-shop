@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main", "development", "feature/**" ]
+    branches: [ "main", "feature/**" ]
     paths-ignore:
       - 'README.md'
       - '.gitignore'
@@ -38,7 +38,7 @@ jobs:
       run: ./mvnw -B package --file pom.xml -DskipTests
 
     - name: Run Unit Tests
-      run: ./mvnw test
+      run: ./mvnw test -DexcludeTags=integration
 
     - name: Run Integration Tests
       run: ./mvnw verify -Pintegration-test
@@ -84,7 +84,6 @@ jobs:
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: terraform apply -auto-approve -input=false
-      working-directory: ./terraform
 
     - name: Get VM Public IP
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -92,7 +91,6 @@ jobs:
       run: |
         IP=$(terraform output -raw public_ip_address)
         echo "vm_public_ip=$IP" >> $GITHUB_OUTPUT
-      working-directory: ./terraform
 
     - name: Show VM Connection Info
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
