@@ -61,11 +61,6 @@ jobs:
 
     - name: Terraform Init
       run: terraform init
-      env:
-        ARM_CLIENT_ID: ${{ secrets.AZURE_CREDENTIALS.app_id }}
-        ARM_CLIENT_SECRET: ${{ secrets.AZURE_CREDENTIALS.password }}
-        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_CREDENTIALS.subscription_id }}
-        ARM_TENANT_ID: ${{ secrets.AZURE_CREDENTIALS.tenant_id }}
 
     - name: Terraform Format
       run: terraform fmt -check
@@ -75,7 +70,14 @@ jobs:
 
     - name: Terraform Plan
       id: plan
-      run: terraform plan -no-color -input=false
+      run: |
+        terraform plan \
+        -var="subscription_id=${{ secrets.AZURE_CREDENTIALS.subscription_id }}" \
+        -var="client_id=${{ secrets.AZURE_CREDENTIALS.app_id }}" \
+        -var="client_secret=${{ secrets.AZURE_CREDENTIALS.password }}" \
+        -var="tenant_id=${{ secrets.AZURE_CREDENTIALS.tenant_id }}" \
+        -no-color \
+        -input=false
       continue-on-error: true
 
     - name: Terraform Plan Status
