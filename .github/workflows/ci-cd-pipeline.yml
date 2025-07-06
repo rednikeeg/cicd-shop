@@ -58,7 +58,12 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v2
+
+    - name: Terraform Init
+      run: terraform init
+
     - name: Terraform Format
       run: terraform fmt -check
