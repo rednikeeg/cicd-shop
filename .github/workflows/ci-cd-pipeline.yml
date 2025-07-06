@@ -71,19 +71,16 @@ jobs:
     - name: Terraform Plan
       id: plan
       run: |
-        # Parse AZURE_CREDENTIALS JSON
         echo "${{ secrets.AZURE_CREDENTIALS }}" > azure_credentials.json
         CLIENT_ID=$(jq -r '.clientId' azure_credentials.json)
         CLIENT_SECRET=$(jq -r '.clientSecret' azure_credentials.json)
         TENANT_ID=$(jq -r '.tenantId' azure_credentials.json)
         
-        # Set environment variables
         echo "ARM_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
         echo "ARM_CLIENT_ID=$CLIENT_ID" >> $GITHUB_ENV
         echo "ARM_CLIENT_SECRET=$CLIENT_SECRET" >> $GITHUB_ENV
         echo "ARM_TENANT_ID=$TENANT_ID" >> $GITHUB_ENV
         
-        # Run terraform plan
         terraform plan -input=false
       continue-on-error: true
 
