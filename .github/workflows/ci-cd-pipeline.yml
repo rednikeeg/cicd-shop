@@ -62,4 +62,4 @@ jobs:
       uses: hashicorp/setup-terraform@v2
     - name: Terraform Format
       run: terraform fmt -check
-      working-directory: ./.terraform
+      working-directory: /.terraform
