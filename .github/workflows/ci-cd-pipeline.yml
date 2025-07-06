@@ -75,7 +75,12 @@ jobs:
         ARM_CLIENT_SECRET: ${{ secrets.AZURE_CREDENTIALS.password }}
         ARM_TENANT_ID: ${{ secrets.AZURE_CREDENTIALS.tenant_id }}
       id: plan
-      run: terraform plan -input=false
+      run: |
+        echo "ARM_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+        echo "ARM_CLIENT_ID=${{ secrets.AZURE_CREDENTIALS.app_id }}" >> $GITHUB_ENV
+        echo "ARM_CLIENT_SECRET=${{ secrets.AZURE_CREDENTIALS.password }}" >> $GITHUB_ENV
+        echo "ARM_TENANT_ID=${{ secrets.AZURE_CREDENTIALS.tenant_id }}" >> $GITHUB_ENV
+        terraform plan -input=false
       continue-on-error: true
 
     - name: Terraform Plan Status
