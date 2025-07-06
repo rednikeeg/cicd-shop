@@ -72,14 +72,14 @@ jobs:
       id: plan
       run: |
         echo "${{ secrets.AZURE_CREDENTIALS }}" > azure_credentials.json
-        CLIENT_ID=$(jq -r '.clientId' azure_credentials.json)
-        CLIENT_SECRET=$(jq -r '.clientSecret' azure_credentials.json)
-        TENANT_ID=$(jq -r '.tenantId' azure_credentials.json)
+        ARM_CLIENT_ID=${{ secrets.APP_ID }}
+        ARM_CLIENT_SECRET=${{ secrets.APP_PASS }}
+        ARM_TENANT_ID=${{ secrets.TENANT_ID }}
         
         echo "ARM_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-        echo "ARM_CLIENT_ID=$CLIENT_ID" >> $GITHUB_ENV
-        echo "ARM_CLIENT_SECRET=$CLIENT_SECRET" >> $GITHUB_ENV
-        echo "ARM_TENANT_ID=$TENANT_ID" >> $GITHUB_ENV
+        echo "ARM_CLIENT_ID=$ARM_CLIENT_ID" >> $GITHUB_ENV
+        echo "ARM_CLIENT_SECRET=$ARM_CLIENT_SECRET" >> $GITHUB_ENV
+        echo "ARM_TENANT_ID=$ARM_TENANT_ID" >> $GITHUB_ENV
         
         terraform plan -input=false
       continue-on-error: true
