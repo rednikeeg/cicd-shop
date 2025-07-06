@@ -70,7 +70,7 @@ jobs:
 
     - name: Terraform Plan
       env:
-        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_CREDENTIALS.subscription_id }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         ARM_CLIENT_ID: ${{ secrets.AZURE_CREDENTIALS.app_id }}
         ARM_CLIENT_SECRET: ${{ secrets.AZURE_CREDENTIALS.password }}
         ARM_TENANT_ID: ${{ secrets.AZURE_CREDENTIALS.tenant_id }}
