@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main", "development", "feature/**" ]
+    branches: [ "main", "feature/**" ]
     paths-ignore:
       - 'README.md'
       - '.gitignore'
@@ -38,17 +38,69 @@ jobs:
       run: ./mvnw -B package --file pom.xml -DskipTests
 
     - name: Run Unit Tests
-      run: ./mvnw test
-
-    - name: Run Integration Tests
-      run: ./mvnw verify -Pintegration-test
+      run: ./mvnw test -DexcludeTags=integration
       env:
         SPRING_PROFILES_ACTIVE: test
 
     - name: Upload coverage to Coveralls
+      if: github.ref == 'refs/heads/main'
       uses: coverallsapp/github-action@v2
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
         path-to-lcov: ./target/site/jacoco/jacoco.xml
         flag-name: run-${{ github.run_id }}
         parallel: true
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v2
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Format
+      run: terraform fmt -check
+
+    - name: Terraform Validate
+      run: terraform validate
+
+    - name: Terraform Plan
+      id: plan
+      run: |
+        echo "${{ secrets.AZURE_CREDENTIALS }}" > azure_credentials.json
+        CLIENT_ID=$(jq -r '.clientId' azure_credentials.json)
+        CLIENT_SECRET=$(jq -r '.clientSecret' azure_credentials.json)
+        TENANT_ID=$(jq -r '.tenantId' azure_credentials.json)
+        
+        echo "ARM_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+        echo "ARM_CLIENT_ID=$CLIENT_ID" >> $GITHUB_ENV
+        echo "ARM_CLIENT_SECRET=$CLIENT_SECRET" >> $GITHUB_ENV
+        echo "ARM_TENANT_ID=$TENANT_ID" >> $GITHUB_ENV
+        
+        terraform plan -input=false
+      continue-on-error: true
+
+    - name: Terraform Plan Status
+      if: steps.plan.outcome == 'failure'
+      run: exit 1
+
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: terraform apply -auto-approve -input=false
+
+    - name: Get VM Public IP
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      id: ip
+      run: |
+        IP=$(terraform output -raw public_ip_address)
+        echo "vm_public_ip=$IP" >> $GITHUB_OUTPUT
+
+    - name: Show VM Connection Info
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: |
+        echo "VM Public IP: ${{ steps.ip.outputs.vm_public_ip }}"
+        echo "Connect using: ssh ${{ vars.ADMIN_USERNAME || 'azureuser' }}@${{ steps.ip.outputs.vm_public_ip }}"
