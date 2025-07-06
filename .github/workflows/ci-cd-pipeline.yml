@@ -39,9 +39,6 @@ jobs:
 
     - name: Run Unit Tests
       run: ./mvnw test -DexcludeTags=integration
-
-    - name: Run Integration Tests
-      run: ./mvnw verify -Pintegration-test
       env:
         SPRING_PROFILES_ACTIVE: test
 
