@@ -52,3 +52,15 @@ jobs:
         path-to-lcov: ./target/site/jacoco/jacoco.xml
         flag-name: run-${{ github.run_id }}
         parallel: true
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v2
+    - name: Terraform Init
+      run: terraform init
+    - name: Terraform Format
+      run: terraform fmt
