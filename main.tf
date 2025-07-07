@@ -18,7 +18,7 @@ resource "azurerm_resource_group" "rg" {
   name     = "cicd-shop-rg"
   location = "norwayeast"
 
-  lags = {
+  tags = {
     Environment = "Azure + Terraform + Github Actions"
     Team        = "DevOps"
   }
