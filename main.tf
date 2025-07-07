@@ -17,4 +17,9 @@ provider "azurerm" {
 resource "azurerm_resource_group" "rg" {
   name     = "cicd-shop-rg"
   location = "norwayeast"
+
+  tags = {
+    Environment = "Azure + Terraform + Github Actions"
+    Team        = "DevOps"
+  }
 }

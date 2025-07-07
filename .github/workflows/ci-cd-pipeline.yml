@@ -85,15 +85,14 @@ jobs:
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: terraform apply -auto-approve -input=false
 
-    - name: Get VM Public IP
+    - name: Get Resource Group ID
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      id: ip
+      id: id
       run: |
-        IP=$(terraform output -raw public_ip_address)
-        echo "vm_public_ip=$IP" >> $GITHUB_OUTPUT
+        ID=$(terraform output -raw resource_group_id)
+        echo "rg_id=$ID" >> $GITHUB_OUTPUT
 
     - name: Show VM Connection Info
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: |
-        echo "VM Public IP: ${{ steps.ip.outputs.vm_public_ip }}"
-        echo "Connect using: ssh ${{ vars.ADMIN_USERNAME || 'azureuser' }}@${{ steps.ip.outputs.vm_public_ip }}"
+        echo "Resource Group ID: ${{ steps.id.outputs.rg_id }}"
