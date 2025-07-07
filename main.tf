@@ -7,6 +7,13 @@ terraform {
     }
   }
 
+  cloud {
+    organization = "rednikeeg_personal_cloud"
+    workspaces {
+      name = "cicd-shop"
+    }
+  }
+
   required_version = ">= 1.1.0"
 }
 
