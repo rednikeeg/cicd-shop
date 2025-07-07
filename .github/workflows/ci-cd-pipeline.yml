@@ -18,6 +18,7 @@ env:
   ARM_CLIENT_SECRET: ${{ secrets.APP_PASS }}
   ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }} 
+  TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
 
 jobs:
   build-and-test:
