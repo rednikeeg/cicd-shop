@@ -91,10 +91,13 @@ jobs:
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       id: id
       run: |
-        ID=$(terraform output -raw resource_group_id)
-        echo "rg_id=$ID" >> $GITHUB_OUTPUT
+        RESOURCE_GROUP_RG_ID=$(terraform output -raw resource_group_rg_id)
+        RESOURCE_GROUP_TF_STATE_ID=$(terraform output -raw resource_group_tfstate_id)
+        echo "resource_group_rg_id=$RESOURCE_GROUP_RG_ID" >> $GITHUB_OUTPUT
+        echo "resource_group_tfstate_id=$RESOURCE_GROUP_TF_STATE_ID" >> $GITHUB_OUTPUT
 
-    - name: Show VM Connection Info
+    - name: Show Resource Group ID
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: |
-        echo "Resource Group ID: ${{ steps.id.outputs.rg_id }}"
+        echo "Resource Group ID: ${{ steps.id.outputs.resource_group_rg_id }}"
+        echo "Resource Group ID: ${{ steps.id.outputs.resource_group_tfstate_id }}"
