@@ -1,0 +1,35 @@
+name: Destroy Infrastructure
+
+on:
+  workflow_dispatch:  # Allows manual trigger
+
+env:
+  ARM_CLIENT_ID: ${{ secrets.APP_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.APP_PASS }}
+  ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v2
+
+    - name: Terraform Init
+      run: terraform init
+
+    # - name: Terraform Format
+    #   run: terraform fmt -check
+
+    - name: Terraform Validate
+      run: terraform validate
+
+    - name: Terraform Plan
+      id: plan
+      run: terraform destroy -auto-approve -input=false
+      continue-on-error: true
